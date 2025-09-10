@@ -150,6 +150,13 @@ function getIconStyle(waypoint) {
 
 // Main KMZ generation function
 // Main KMZ generation function - Updated Version
+/**
+ * Generates a KMZ buffer (compressed KML) for given waypoints and route type.
+ * Includes dynamic icon styles and path lines.
+ * @param {Array<{latitude:number, longitude:number, name?:string, description?:string, gpsDetails?:any, poleDetails?:any, routeType?:string}>} waypoints
+ * @param {"existing"|"new"} [routeType="existing"] - Route styling variant.
+ * @returns {Promise<Buffer>} KMZ file buffer.
+ */
 async function generateKmzBuffer(waypoints, routeType = "existing") {
   try {
     const iconsDir = path.join(__dirname, "../icons");

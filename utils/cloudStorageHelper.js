@@ -4,7 +4,12 @@ const bucketName = process.env.GCLOUD_BUCKET_NAME;
 const projectId = process.env.GCLOUD_PROJECT_ID;
 const keyFilename = process.env.GCLOUD_KEY_FILE;
 
-// Helper function to create error responses
+/**
+ * Constructs a standardized error response object.
+ * @param {string} message - Human-readable error message.
+ * @param {number} [statusCode=400] - HTTP-like status code for the error.
+ * @returns {{success:false, error:{code:number, message:string}}}
+ */
 const createErrorResponse = (message, statusCode = 400) => {
   return {
     success: false,
@@ -15,7 +20,10 @@ const createErrorResponse = (message, statusCode = 400) => {
   };
 };
 
-// Validate environment variables
+/**
+ * Validates required Google Cloud Storage environment variables.
+ * @returns {null | {success:false, error:{code:number, message:string}}}
+ */
 const validateEnvironment = () => {
   const errors = [];
   if (!bucketName)
@@ -49,6 +57,13 @@ if (!envError) {
 
 const allowedMimeTypes = ["image/jpeg", "image/jpg", "image/png"];
 
+/**
+ * Uploads an image to Google Cloud Storage.
+ * Performs environment, service, and MIME type validations.
+ * @param {{ originalname: string, mimetype: string, buffer: Buffer }} file - In-memory file object (e.g., from Multer).
+ * @param {string} [folder="uploads"] - Destination folder within the bucket.
+ * @returns {Promise<string | {success:false, error:{code:number, message:string}}>} Public URL on success or error object.
+ */
 const uploadImageToCloudStorage = async (file, folder = "uploads") => {
   // Check if storage was initialized properly
   if (envError) return envError;
@@ -90,6 +105,11 @@ const uploadImageToCloudStorage = async (file, folder = "uploads") => {
   }
 };
 
+/**
+ * Deletes an image from Google Cloud Storage using its public URL.
+ * @param {string} imageUrl - Public URL previously returned by the uploader.
+ * @returns {Promise<{success:true} | {success:false, error:{code:number, message:string}}>} Deletion result or error object.
+ */
 const deleteImageFromCloudStorage = async (imageUrl) => {
   // Check if storage was initialized properly
   if (envError) return envError;

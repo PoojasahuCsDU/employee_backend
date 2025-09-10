@@ -79,6 +79,52 @@ router.post(
   registerUser
 );
 
+/**
+ * @swagger
+ * /api/auth/admins:
+ *   get:
+ *     summary: Get all admin users
+ *     description: Retrieves a list of all admin users. Admin access only.
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of admins retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     example: "60d21b4667d0d8992e610c85"
+ *                   name:
+ *                     type: string
+ *                     example: "Admin User"
+ *                   empId:
+ *                     type: string
+ *                     example: "ADM001"
+ *                   email:
+ *                     type: string
+ *                     example: "admin@example.com"
+ *                   role:
+ *                     type: string
+ *                     enum: [admin]
+ *                     example: "admin"
+ *                   image:
+ *                     type: string
+ *                     example: "https://storage.googleapis.com/your-bucket/admin.jpg"
+ *                     nullable: true
+ *       401:
+ *         description: Unauthorized - Bearer token missing or invalid
+ *       403:
+ *         description: Forbidden - User is not an admin
+ *       500:
+ *         description: Internal server error
+ */
 router.get("/admins", verifyToken, isAdmin, async (req, res) => {
   try {
     const admins = await User.find({ role: "admin" }).select("-password");

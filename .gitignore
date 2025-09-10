@@ -1,0 +1,4 @@
+node_modules
+.env
+uploads
+./config/gpsempolyeetracking-0b2f51a31dc3.json

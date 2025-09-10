@@ -1,0 +1,37 @@
+{
+  "name": "ems_backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "Pooja Sahu",
+  "license": "ISC",
+  "description": "Backend for Employee and Survey Management",
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^7.16.0",
+    "adm-zip": "^0.5.16",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
+    "image-size": "^2.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongo-sanitize": "^1.1.0",
+    "mongoose": "^8.12.2",
+    "multer": "^1.4.5-lts.2",
+    "pdfkit": "^0.17.1",
+    "rate-limiter-flexible": "^7.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "tokml": "^0.4.0"
+  }
+}

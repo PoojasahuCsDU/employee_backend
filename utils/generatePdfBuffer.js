@@ -47,6 +47,12 @@ function getShortestPath(waypoints) {
   return waypoints;
 }
 
+/**
+ * Generates a PDF buffer visualizing waypoints with icons and a legend.
+ * Dynamically scales elements based on waypoint count.
+ * @param {Array<{latitude:number, longitude:number, name?:string, gpsDetails?:any, poleDetails?:any, routeType?:string}>} waypoints
+ * @returns {Promise<Buffer>} PDF buffer ready to send as a file response.
+ */
 async function generatePdfBuffer(waypoints) {
   return new Promise((resolve, reject) => {
     try {

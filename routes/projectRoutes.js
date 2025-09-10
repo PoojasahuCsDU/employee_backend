@@ -255,62 +255,72 @@ router.get(
   getProjectWaypoints
 );
 
-// /**
-//  * @swagger
-//  * /api/projects/{projectId}/waypoints/{waypointId}:
-//  *   patch:
-//  *     summary: Update a waypoint of a project
-//  *     description: Update a waypoint of a project by its ID. Only employees can update waypoints.
-//  *     tags:
-//  *       - Employee
-//  *     security:
-//  *       - bearerAuth: []
-//  *     parameters:
-//  *       - in: path
-//  *         name: projectId
-//  *         required: true
-//  *         description: ID of the project whose waypoint will be updated
-//  *         schema:
-//  *           type: string
-//  *       - in: path
-//  *         name: waypointId
-//  *         required: true
-//  *         description: ID of the waypoint to be updated
-//  *         schema:
-//  *           type: string
-//  *     requestBody:
-//  *       required: true
-//  *       content:
-//  *         application/json:
-//  *           schema:
-//  *             type: object
-//  *             properties:
-//  *               name:
-//  *                 type: string
-//  *                 description: Name of the waypoint
-//  *               location:
-//  *                 type: string
-//  *                 description: Location of the waypoint
-//  *               coordinates:
-//  *                 type: array
-//  *                 items:
-//  *                   type: number
-//  *                 description: Coordinates of the waypoint
-//  *     responses:
-//  *       200:
-//  *         description: Waypoint updated successfully
-//  *       400:
-//  *         description: Invalid input
-//  *       401:
-//  *         description: Unauthorized
-//  *       404:
-//  *         description: Project or waypoint not found
-//  *       500:
-//  *         description: Internal server error
-//  */
-
-// router.patch("/:projectId/waypoints/:waypointId", authMiddleware("employee"), updateWaypoint);
-
+/**
+ * @swagger
+ * /api/projects/{projectId}/waypoints/{waypointId}:
+ *   patch:
+ *     summary: Update a waypoint of a project
+ *     description: Update a waypoint of a project. Only the employee who created the waypoint can update it.
+ *     tags: [Employee]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         description: ID of the project containing the waypoint
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: waypointId
+ *         required: true
+ *         description: ID of the waypoint to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Updated name of the waypoint
+ *               description:
+ *                 type: string
+ *                 description: Updated description
+ *               latitude:
+ *                 type: number
+ *                 description: Updated latitude coordinate
+ *               longitude:
+ *                 type: number
+ *                 description: Updated longitude coordinate
+ *               poleDetails:
+ *                 type: string
+ *                 description: JSON stringified array of updated pole details
+ *                 example: '[{"poleNo":1,"poleType":"metal"}]'
+ *               gpsDetails:
+ *                 type: string
+ *                 description: JSON stringified array of updated GPS details
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: New image file
+ *     responses:
+ *       200:
+ *         description: Waypoint updated successfully
+ *       400:
+ *         description: Invalid input data
+ *       401:
+ *         description: Unauthorized - Not authenticated
+ *       403:
+ *         description: Forbidden - Not the waypoint creator
+ *       404:
+ *         description: Project or waypoint not found
+ *       500:
+ *         description: Internal server error
+ */
 
 /**
  * @swagger

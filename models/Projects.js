@@ -1,14 +1,18 @@
 const mongoose = require("mongoose");
 
+/**
+ * Schema for pole-specific details and equipment quantities
+ * @typedef {Object} PoleDetails
+ */
 const PoleDetailsSchema = new mongoose.Schema(
   {
     poleNo: { type: Number },
     existingOrNewProposed: { type: String, required: true },
     poleDiscription: { type: String, required: true },
-
     poleType: { type: String, required: true },
     poleSizeInMeter: { type: Number, required: true },
     poleStructure: { type: String, required: true },
+    // Equipment quantities with default values
     _3PhaseLTDistributionBox: { type: Number, default: 0 },
     abSwitch: { type: Number, default: 0 },
     anchorRod: { type: Number, default: 0 },
@@ -57,18 +61,20 @@ const PoleDetailsSchema = new mongoose.Schema(
   },
   { _id: false }
 );
+
+/**
+ * Schema for GPS and location-specific details
+ * @typedef {Object} GpsDetails
+ */
 const GpsDetailSchema = new mongoose.Schema(
   {
     timeAndDate: { type: String, required: true },
-    userId: {
-      type: String,
-      required: true,
-    },
-
+    userId: { type: String, required: true },
     district: { type: String },
     routeStartPoint: { type: String },
     lengthInMeter: { type: Number },
 
+    // Coordinate information
     startPointCoordinates: {
       latitude: { type: Number },
       longitude: { type: Number },
@@ -78,17 +84,17 @@ const GpsDetailSchema = new mongoose.Schema(
       longitude: { type: Number },
     },
 
+    // Feeder and transformer details
     substationName: { type: String },
     feederName: { type: String },
     conductor: { type: String },
-    cable: { type: String,default:null },
+    cable: { type: String, default: null },
+    transformerLocation: { type: String, default: null },
+    transformerType: { type: String, default: null },
+    transformerPoleType: { type: String, default: null },
+    transformerKV: { type: String, default: null },
 
-    transformerLocation: { type: String,default:null },
-    transformerType:{type:String,default:null},
-    transformerPoleType:{type:String,default:null},
-    transformerKV: { type: String,default:null },
-
-    ltDistributionBox3Phase: { type: Number, default: 0 },
+    // Equipment quantities
     abSwitch: { type: Number, default: 0 },
     anchorRod: { type: Number, default: 0 },
     anchoringAssembly: { type: Number, default: 0 },
@@ -139,35 +145,51 @@ const GpsDetailSchema = new mongoose.Schema(
   { _id: false }
 );
 
+/**
+ * Schema for individual waypoints in a project route
+ * @typedef {Object} Waypoint
+ */
 const WaypointSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String },
-    distanceFromPrevious: { type: Number,default: 0 },
+    distanceFromPrevious: { type: Number, default: 0 },
     latitude: { type: Number, required: true },
     longitude: { type: Number, required: true },
-    routeType:{type:String, required:true},
-    routeStartingPoint:{type:String, required:true},
-    routeEndingPoint:{type:String, required:true},
+    routeType: { type: String, required: true },
+    routeStartingPoint: { type: String, required: true },
+    routeEndingPoint: { type: String, required: true },
     isEnd: { type: Boolean, default: false },
     isStart: { type: Boolean, default: false },
     image: { type: String, default: null },
 
+    // Nested schemas
     poleDetails: [PoleDetailsSchema],
     gpsDetails: [GpsDetailSchema],
 
+    // Metadata
     timestamp: { type: Date, default: Date.now },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-
     pathOwner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { _id: true }
 );
 
+/**
+ * Main Project Schema
+ * @typedef {Object} Project
+ * @property {string} projectId - Unique identifier for the project (auto-generated)
+ * @property {string} circle - Project circle name
+ * @property {string} division - Project division name
+ * @property {string} [description] - Optional project description
+ * @property {ObjectId} createdBy - Reference to the user who created the project
+ * @property {ObjectId[]} employees - Array of user references assigned to the project
+ * @property {Waypoint[][]} waypoints - 2D array of waypoints for multiple routes
+ */
 const ProjectSchema = new mongoose.Schema({
   projectId: { type: String, unique: true },
   circle: { type: String, required: true },
@@ -178,6 +200,10 @@ const ProjectSchema = new mongoose.Schema({
   waypoints: [[WaypointSchema]],
 });
 
+/**
+ * Pre-save middleware to auto-generate projectId
+ * Generates a unique project ID in the format "Project_X" where X is an incremental number
+ */
 ProjectSchema.pre("save", async function (next) {
   if (this.isNew && !this.projectId) {
     const count = await mongoose.model("Project").countDocuments();

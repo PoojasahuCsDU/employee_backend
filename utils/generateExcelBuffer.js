@@ -1,5 +1,10 @@
 const ExcelJS = require("exceljs");
 
+/**
+ * Generates an Excel workbook buffer summarizing waypoint inventory and materials.
+ * @param {Array<Object>} waypoints - Ordered list of waypoint objects with `gpsDetails` and `poleDetails`.
+ * @returns {Promise<Buffer>} XLSX buffer suitable for sending as a file response.
+ */
 async function generateExcelBuffer(waypoints) {
   const workbook = new ExcelJS.Workbook();
 

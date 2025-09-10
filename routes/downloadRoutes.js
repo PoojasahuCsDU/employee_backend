@@ -89,7 +89,7 @@ router.get("/excel/:projectId/:empId",authMiddleware(['admin']), excelController
  * @swagger
  * /api/downloads/pdf/{projectId}/{empId}:
  *   get:
- *     summary: Download Excel file of employee's waypoints of a project
+ *     summary: Download PDF file of employee's waypoints of a project
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
@@ -108,7 +108,12 @@ router.get("/excel/:projectId/:empId",authMiddleware(['admin']), excelController
  *         description: Employee ID whose waypoints will be downloaded
  *     responses:
  *       200:
- *         description: Pdf file downloaded successfully
+ *         description: PDF file downloaded successfully
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
  *       400:
  *         description: Bad Request - Missing projectId or empId
  *       403:
@@ -118,8 +123,7 @@ router.get("/excel/:projectId/:empId",authMiddleware(['admin']), excelController
  *       500:
  *         description: Internal Server Error
  */
-
-router.get("/pdf/:projectId/:empId",authMiddleware(['admin']), pdfController.downloadPdf);
+router.get("/pdf/:projectId/:empId", authMiddleware(['admin']), pdfController.downloadPdf);
 
 
 

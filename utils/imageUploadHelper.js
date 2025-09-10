@@ -15,4 +15,6 @@ const handleSingleImageUpload = async (req) => {
   return await uploadImageToCloudStorage(req.file);
 };
 
+
+
 module.exports = { handleSingleImageUpload };

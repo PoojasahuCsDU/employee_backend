@@ -66,9 +66,10 @@ router.patch(
 );
 /**
  * @swagger
- * /api/users/:empId:
+ * /api/users/{empId}:
  *   get:
  *     summary: Get a user by empId
+ *     description: Retrieve user details by their employee ID. Accessible by both admin and employees.
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -82,6 +83,30 @@ router.patch(
  *     responses:
  *       200:
  *         description: The user information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     empId:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     mobileNo:
+ *                       type: string
+ *                     image:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                       enum: [admin, employee]
  *       404:
  *         description: User not found
  *       500:

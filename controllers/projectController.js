@@ -2,7 +2,29 @@ const Project = require("../models/Projects");
 const User = require("../models/Users");
 const { handleSingleImageUpload } = require("../utils/imageUploadHelper");
 
-//controller function to create a new project(only admin can create a new project)
+/**
+ * Project Management Controller
+ * @module controllers/projectController
+ * 
+ * Handles project creation, employee assignment, waypoint management, and project queries
+ * Implements role-based access control for admin and employee operations
+ */
+
+/**
+ * Create a new project (admin only)
+ * @async
+ * @function createProject
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body containing project details
+ * @param {string} req.body.projectId - Unique project identifier
+ * @param {string} req.body.circle - Project circle name
+ * @param {string} req.body.division - Project division name
+ * @param {string} [req.body.description] - Project description
+ * @param {Object} req.user - Authenticated user object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} 
+ * @throws {400} - If required fields are missing or project already exists
+ */
 exports.createProject = async (req, res) => {
   try {
     const { projectId, circle, division, description } = req.body;
@@ -33,7 +55,18 @@ exports.createProject = async (req, res) => {
   }
 };
 
-//controller function to assign an employee to a project(only admin can assign an employee to a project)
+/**
+ * Assign an employee to a project (admin only)
+ * @async
+ * @function assignEmployee
+ * @param {Object} req - Express request object
+ * @param {string} req.params.projectId - Project identifier
+ * @param {string} req.body.empId - Employee ID to assign
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {400} - If employee ID is missing or already assigned
+ * @throws {404} - If project or employee not found
+ */
 exports.assignEmployee = async (req, res) => {
   try {
     const { projectId } = req.params;
@@ -79,8 +112,17 @@ exports.assignEmployee = async (req, res) => {
   }
 };
 
-//controller function to get all projects assigned to an employee
-//(only employee can get all projects assigned to him)
+/**
+ * Get all projects assigned to the authenticated employee
+ * @async
+ * @function getMyProjects
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {404} - If no projects found
+ * @throws {500} - For server errors
+ */
 exports.getMyProjects = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -111,7 +153,30 @@ exports.getMyProjects = async (req, res) => {
   }
 };
 
-//controller function to add a waypoint to a project(only employee can add a waypoint to a project)
+/**
+ * Add a waypoint to a project (employee only)
+ * @async
+ * @function addWaypoint
+ * @param {Object} req - Express request object
+ * @param {string} req.params.projectId - Project identifier
+ * @param {Object} req.body - Waypoint details
+ * @param {string} req.body.name - Waypoint name
+ * @param {string} [req.body.description] - Waypoint description
+ * @param {number} req.body.latitude - Waypoint latitude
+ * @param {number} req.body.longitude - Waypoint longitude
+ * @param {boolean} req.body.isStart - Indicates start of route
+ * @param {boolean} req.body.isEnd - Indicates end of route
+ * @param {Array} req.body.poleDetails - Pole information
+ * @param {Array} req.body.gpsDetails - GPS details
+ * @param {string} req.body.routeType - Type of route
+ * @param {string} req.body.routeStartingPoint - Route start location
+ * @param {string} req.body.routeEndingPoint - Route end location
+ * @param {Object} [req.file] - Uploaded image file
+ * @returns {Promise<void>}
+ * @throws {400} - If required fields are missing or validation fails
+ * @throws {403} - If employee not assigned to project
+ * @throws {404} - If project not found
+ */
 exports.addWaypoint = async (req, res) => {
   try {
     const { projectId } = req.params;
@@ -299,8 +364,17 @@ exports.addWaypoint = async (req, res) => {
   }
 };
 
-//controller function to get all waypoints of a project(only admin and employee can get all waypoints of a project)
-//(admin can get all waypoints of a project and employee can get only his waypoints)
+/**
+ * Get project waypoints based on user role
+ * @async
+ * @function getProjectWaypoints
+ * @param {Object} req - Express request object
+ * @param {string} req.params.projectId - Project identifier
+ * @param {Object} req.user - Authenticated user object
+ * @returns {Promise<void>}
+ * @throws {403} - If unauthorized access
+ * @throws {404} - If project not found
+ */
 exports.getProjectWaypoints = async (req, res) => {
   try {
     const { projectId } = req.params;
@@ -405,7 +479,16 @@ exports.getProjectWaypoints = async (req, res) => {
 //   }
 // };
 
-//controller function to get all projects(only admin can get all projects)
+/**
+ * Get all projects (admin only)
+ * @async
+ * @function allProjects
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {404} - If no projects found
+ * @throws {500} - For server errors
+ */
 exports.allProjects = async (req, res) => {
   try {
     const projects = await Project.find()
@@ -433,7 +516,17 @@ exports.allProjects = async (req, res) => {
   }
 };
 
-//controller function to get all waypoints added by an employee)
+/**
+ * Get all waypoints added by an employee
+ * @async
+ * @function getAllWaypointsEmployee
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {404} - If employee not found
+ * @throws {500} - For server errors
+ */
 exports.getAllWaypointsEmployee = async (req, res) => {
   try {
     const { empId } = req.user;
@@ -579,3 +672,25 @@ exports.getAllWaypointsEmployee = async (req, res) => {
     });
   }
 };
+
+/**
+ * @typedef {Object} WaypointResponse
+ * @property {boolean} success - Operation success status
+ * @property {string} message - Response message
+ * @property {Object} [waypoint] - Created/updated waypoint data
+ */
+
+/**
+ * @typedef {Object} ProjectResponse
+ * @property {boolean} success - Operation success status
+ * @property {string} message - Response message
+ * @property {number} [count] - Number of projects/items
+ * @property {Array} [projects] - List of projects
+ */
+
+/**
+ * @typedef {Object} ErrorResponse
+ * @property {boolean} success - Always false for errors
+ * @property {string} message - Error message
+ * @property {string} [error] - Detailed error message (development only)
+ */

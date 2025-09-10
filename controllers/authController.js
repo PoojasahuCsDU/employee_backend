@@ -5,15 +5,41 @@ const { handleSingleImageUpload } = require("../utils/imageUploadHelper");
 const rateLimit = require("express-rate-limit");
 const sanitize = require("mongo-sanitize");
 
-// Admin-specific security enhancements
+/**
+ * Authentication and User Management Controller
+ * @module controllers/authController
+ * 
+ * Handles user registration, authentication, and user management operations
+ * Implements security measures including rate limiting and input sanitization
+ */
 
-//controller function to register a new user(only admin can register a new user)
+/**
+ * Register a new user (admin-only operation)
+ * @async
+ * @function registerUser
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.name - User's full name
+ * @param {string} req.body.empId - Unique employee ID
+ * @param {string} req.body.password - User's password
+ * @param {string} req.body.email - User's email address
+ * @param {string} req.body.mobileNo - User's mobile number
+ * @param {('admin'|'employee')} req.body.role - User's role
+ * @param {Object} req.file - Uploaded image file
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {400} - If required fields are missing
+ * @throws {403} - If non-admin tries to create admin account
+ * @throws {409} - If user already exists
+ * @throws {500} - For server errors
+ */
 exports.registerUser = async (req, res) => {
   try {
     // Sanitize inputs to prevent injection attacks
     const cleanBody = sanitize(req.body);
     const { name, empId, password, email, mobileNo, role } = cleanBody;
 
+    
     // Input validation
     if (!name || !password || !role || !email) {
       return res.status(400).json({
@@ -96,8 +122,20 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-// Enhanced admin login with security features
-//controller function to login an admin
+/**
+ * Authenticate admin users
+ * @async
+ * @function loginAdmin
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.empId - Employee ID
+ * @param {string} req.body.password - Password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {400} - If credentials are missing
+ * @throws {401} - If credentials are invalid
+ * @throws {500} - For server errors
+ */
 exports.loginAdmin = async (req, res) => {
   const { empId, password } = sanitize(req.body);
 
@@ -174,8 +212,20 @@ exports.loginAdmin = async (req, res) => {
   }
 };
 
-// Keep existing employee login unchanged
-//controller function to login an employee
+/**
+ * Authenticate employee users
+ * @async
+ * @function loginEmployee
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.empId - Employee ID
+ * @param {string} req.body.password - Password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {400} - If credentials are missing
+ * @throws {401} - If credentials are invalid
+ * @throws {500} - For server errors
+ */
 exports.loginEmployee = async (req, res) => {
   const { empId, password } = req.body;
   if (!empId || !password) {
@@ -204,8 +254,17 @@ exports.loginEmployee = async (req, res) => {
   }
 };
 
-// Enhanced getCurrentUser with admin checks
-//controller function to get the current user details
+/**
+ * Get current authenticated user's details
+ * @async
+ * @function getCurrentUser
+ * @param {Object} req - Express request object
+ * @param {Object} req.user - Authenticated user object from JWT
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {404} - If user not found
+ * @throws {500} - For server errors
+ */
 exports.getCurrentUser = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -237,7 +296,11 @@ exports.getCurrentUser = async (req, res) => {
   }
 };
 
-// Admin-specific rate limiter
+/**
+ * Rate limiter middleware for admin routes
+ * Limits requests to 100 per 15 minutes per IP
+ * @constant {Object} adminLimiter
+ */
 exports.adminLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -254,7 +317,15 @@ exports.adminLimiter = rateLimit({
   },
 });
 
-//Fetches all employees with role 'employee' from the database
+/**
+ * Get all employees from the database
+ * @async
+ * @function getAllEmployees
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {500} - For server errors
+ */
 exports.getAllEmployees = async (req, res) => {
   try {
     // Query employees with lean() for better performance since we just need plain objects
@@ -276,3 +347,17 @@ exports.getAllEmployees = async (req, res) => {
     });
   }
 };
+
+/**
+ * @typedef {Object} UserResponse
+ * @property {boolean} success - Indicates if the operation was successful
+ * @property {string} message - Response message
+ * @property {Object} [user] - User object (optional)
+ * @property {string} [token] - JWT token (optional)
+ */
+
+/**
+ * @typedef {Object} ErrorResponse
+ * @property {boolean} success - Always false for errors
+ * @property {string} message - Error message
+ */

@@ -53,3 +53,6 @@ JWT_SECRET=your-jwt-secret
 FRONTEND_URL=your-frontend-url
 GOOGLE_CLOUD_PROJECT_ID=your-gcp-project-id
 GOOGLE_CLOUD_BUCKET=your-gcp-bucket
+
+## Backend Deployed
+https://ems-backend-369113394426.asia-south2.run.app
